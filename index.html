@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conta Punti AURA O3TT</title>
+
+<style>
+body {margin:0;background:#000;color:#fff;font-family:-apple-system;}
+.container{padding:20px;}
+h1{color:#FFD700;}
+.card{background:#111;padding:15px;margin-top:15px;border-radius:15px;}
+.leader{border:2px solid #FFD700;}
+.points{font-size:28px;color:#FFD700;}
+.controls{display:flex;gap:10px;margin-top:10px;}
+button{flex:1;padding:10px;border:none;border-radius:10px;font-weight:bold;}
+.plus{background:#00C853;color:#fff;}
+.minus{background:#D50000;color:#fff;}
+input{padding:10px;border-radius:10px;border:none;width:65%;}
+.add{background:#FFD700;}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>Conta Punti AURA O3TT</h1>
+<input id="name" placeholder="Nome atleta">
+<button class="add" onclick="add()">Aggiungi</button>
+<div id="list"></div>
+</div>
+
+<script>
+let data = JSON.parse(localStorage.getItem("o3tt") || "{}");
+
+function save(){localStorage.setItem("o3tt", JSON.stringify(data));}
+
+function render(){
+ let html="";
+ let sorted = Object.keys(data).sort((a,b)=>data[b]-data[a]);
+
+ sorted.forEach((n,i)=>{
+ html+=`
+ <div class="card ${i==0?"leader":""}">
+ <b>${n}</b>
+ <div class="points">${data[n]}</div>
+ <div class="controls">
+ <button class="minus" onclick="change('${n}',-1)">-</button>
+ <button class="plus" onclick="change('${n}',1)">+</button>
+ </div>
+ </div>`;
+ });
+
+ document.getElementById("list").innerHTML=html;
+}
+
+function add(){
+ let n=document.getElementById("name").value;
+ if(!n)return;
+ data[n]=100;
+ save();
+ render();
+}
+
+function change(n,v){
+ data[n]+=v;
+ save();
+ render();
+}
+
+render();
+</script>
+
+</body>
+</html>
