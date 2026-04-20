@@ -1,74 +1,993 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Conta Punti AURA O3TT</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Conta Punti AURA O3TT</title>
+  <meta name="theme-color" content="#000000" />
+  <style>
+    :root{
+      --bg:#000000;
+      --panel:#111111;
+      --panel-2:#1a1a1a;
+      --text:#f5f5f5;
+      --muted:#b8b8b8;
+      --yellow:#ffd400;
+      --yellow-soft:rgba(255,212,0,.14);
+      --green:#13c05a;
+      --green-soft:rgba(19,192,90,.16);
+      --red:#e5484d;
+      --red-soft:rgba(229,72,77,.16);
+      --border:rgba(255,255,255,.08);
+      --shadow:0 12px 28px rgba(0,0,0,.35);
+      --radius-xl:24px;
+      --radius-lg:18px;
+      --radius-md:14px;
+    }
 
-<style>
-body {margin:0;background:#000;color:#fff;font-family:-apple-system;}
-.container{padding:20px;}
-h1{color:#FFD700;}
-.card{background:#111;padding:15px;margin-top:15px;border-radius:15px;}
-.leader{border:2px solid #FFD700;}
-.points{font-size:28px;color:#FFD700;}
-.controls{display:flex;gap:10px;margin-top:10px;}
-button{flex:1;padding:10px;border:none;border-radius:10px;font-weight:bold;}
-.plus{background:#00C853;color:#fff;}
-.minus{background:#D50000;color:#fff;}
-input{padding:10px;border-radius:10px;border:none;width:65%;}
-.add{background:#FFD700;}
-</style>
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(255,212,0,.10), transparent 28%),
+        radial-gradient(circle at top right, rgba(255,212,0,.06), transparent 24%),
+        linear-gradient(180deg,#050505 0%,#000 100%);
+      color:var(--text);
+      min-height:100vh;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .app{
+      max-width:900px;
+      margin:0 auto;
+      padding:18px 14px 32px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      margin-bottom:16px;
+    }
+
+    .brand{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      background:var(--yellow);
+      color:#000;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:1.4px;
+      margin-bottom:10px;
+    }
+
+    h1{
+      margin:0;
+      font-size:30px;
+      line-height:1.05;
+      color:var(--yellow);
+    }
+
+    .pill{
+      white-space:nowrap;
+      background:var(--yellow-soft);
+      color:var(--yellow);
+      border:1px solid rgba(255,212,0,.20);
+      padding:10px 14px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.8px;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    .stat-card,
+    .panel,
+    .player-card,
+    .modal-box{
+      background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));
+      background-color:var(--panel);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+    }
+
+    .stat-card{
+      border-radius:var(--radius-lg);
+      padding:14px;
+    }
+
+    .stat-label{
+      display:block;
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:8px;
+    }
+
+    .stat-value{
+      font-size:22px;
+      font-weight:900;
+    }
+
+    .panel{
+      border-radius:var(--radius-xl);
+      padding:14px;
+      margin-bottom:14px;
+    }
+
+    .input-wrap{
+      display:flex;
+      gap:10px;
+      margin-bottom:10px;
+    }
+
+    input, select{
+      width:100%;
+      border:1px solid var(--border);
+      background:var(--panel-2);
+      color:var(--text);
+      border-radius:16px;
+      padding:15px 14px;
+      font-size:16px;
+      outline:none;
+    }
+
+    input:focus, select:focus{
+      border-color:rgba(255,212,0,.35);
+      box-shadow:0 0 0 3px rgba(255,212,0,.08);
+    }
+
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    button{
+      border:0;
+      border-radius:14px;
+      padding:13px 16px;
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+      transition:transform .08s ease, opacity .2s ease;
+    }
+
+    button:active{transform:scale(.98)}
+
+    .btn-yellow{background:var(--yellow); color:#000}
+    .btn-dark{
+      background:#242424;
+      color:#fff;
+      border:1px solid rgba(255,255,255,.06);
+    }
+    .btn-red{background:var(--red); color:#fff}
+    .btn-green{background:var(--green); color:#fff}
+
+    .players-list{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .empty{
+      text-align:center;
+      color:var(--muted);
+      padding:28px 18px;
+      border:1px dashed rgba(255,255,255,.10);
+      border-radius:24px;
+      background:rgba(255,255,255,.02);
+    }
+
+    .player-card{
+      border-radius:22px;
+      padding:16px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .player-card.leader{
+      border-color:rgba(255,212,0,.30);
+      box-shadow:0 0 0 1px rgba(255,212,0,.08), var(--shadow);
+    }
+
+    .player-card.leader::before{
+      content:"LEADER";
+      position:absolute;
+      top:12px;
+      right:12px;
+      background:var(--yellow);
+      color:#000;
+      font-size:11px;
+      font-weight:900;
+      padding:6px 10px;
+      border-radius:999px;
+    }
+
+    .player-top{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+    }
+
+    .player-name{
+      margin:0;
+      font-size:22px;
+      font-weight:900;
+    }
+
+    .player-sub{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .points-box{
+      text-align:right;
+      min-width:130px;
+    }
+
+    .points{
+      font-size:42px;
+      line-height:1;
+      font-weight:900;
+      color:var(--yellow);
+    }
+
+    .points-label{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .score-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:10px;
+      margin-top:16px;
+    }
+
+    .score-btn.minus{
+      background:var(--red-soft);
+      color:var(--red);
+    }
+
+    .score-btn.plus{
+      background:var(--green-soft);
+      color:var(--green);
+    }
+
+    .score-btn.manual{
+      background:var(--yellow-soft);
+      color:var(--yellow);
+    }
+
+    .meta-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .meta-btn{
+      background:#1c1c1c;
+      color:#fff;
+      border:1px solid rgba(255,255,255,.06);
+      padding:11px 14px;
+      font-size:14px;
+    }
+
+    .rule-row{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:10px;
+      margin-top:14px;
+      align-items:center;
+    }
+
+    .apply-row{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:10px;
+      margin-top:12px;
+      align-items:center;
+    }
+
+    .rules-list{
+      display:grid;
+      gap:8px;
+      margin-top:12px;
+    }
+
+    .rule-item{
+      display:grid;
+      grid-template-columns: 1fr auto auto;
+      gap:8px;
+      align-items:center;
+      background:#171717;
+      border:1px solid rgba(255,255,255,.05);
+      border-radius:14px;
+      padding:10px 12px;
+    }
+
+    .rule-badge{
+      font-weight:900;
+      min-width:60px;
+      text-align:right;
+    }
+
+    .rule-badge.positive{ color: var(--green); }
+    .rule-badge.negative{ color: var(--red); }
+
+    .modal{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      background:rgba(0,0,0,.72);
+      backdrop-filter: blur(4px);
+      z-index:1000;
+    }
+
+    .modal.open{display:flex}
+
+    .modal-box{
+      width:min(100%,540px);
+      border-radius:24px;
+      padding:18px;
+      max-height:90vh;
+      overflow:auto;
+    }
+
+    .modal-title{
+      margin:0 0 8px;
+      font-size:22px;
+      color:var(--yellow);
+    }
+
+    .modal-text{
+      margin:0 0 14px;
+      color:var(--muted);
+      line-height:1.4;
+    }
+
+    .modal-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    .mini{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:8px;
+    }
+
+    @media (max-width:640px){
+      .topbar{flex-direction:column}
+      .stats{grid-template-columns:1fr}
+      .input-wrap{flex-direction:column}
+      .player-top{flex-direction:column}
+      .points-box{text-align:left}
+      .score-actions{grid-template-columns:1fr}
+      .rule-row, .apply-row{grid-template-columns:1fr}
+      .rule-item{grid-template-columns: 1fr auto}
+    }
+  </style>
 </head>
-
 <body>
+  <div class="app">
+    <header class="topbar">
+      <div>
+        <div class="brand">O3TT</div>
+        <h1>Conta Punti AURA O3TT</h1>
+      </div>
+      <div class="pill">AURA MODE</div>
+    </header>
 
-<div class="container">
-<h1>Conta Punti AURA O3TT</h1>
-<input id="name" placeholder="Nome atleta">
-<button class="add" onclick="add()">Aggiungi</button>
-<div id="list"></div>
-</div>
+    <section class="stats">
+      <div class="stat-card">
+        <span class="stat-label">Partecipanti</span>
+        <div class="stat-value" id="statPlayers">0</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Leader</span>
+        <div class="stat-value" id="statLeader">—</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Top score</span>
+        <div class="stat-value" id="statTop">—</div>
+      </div>
+    </section>
 
-<script>
-let data = JSON.parse(localStorage.getItem("o3tt") || "{}");
+    <section class="panel">
+      <div class="input-wrap">
+        <input id="nameInput" type="text" placeholder="Inserisci nome atleta" maxlength="24" />
+        <button id="addBtn" class="btn-yellow">Aggiungi</button>
+      </div>
 
-function save(){localStorage.setItem("o3tt", JSON.stringify(data));}
+      <div class="toolbar">
+        <button id="sortBtn" class="btn-dark">Ordina classifica</button>
+        <button id="resetAllBtn" class="btn-red">Reset totale</button>
+        <button id="manageRulesBtn" class="btn-green">Gestisci premi / penalità</button>
+      </div>
+    </section>
 
-function render(){
- let html="";
- let sorted = Object.keys(data).sort((a,b)=>data[b]-data[a]);
+    <section id="playersList" class="players-list"></section>
+  </div>
 
- sorted.forEach((n,i)=>{
- html+=`
- <div class="card ${i==0?"leader":""}">
- <b>${n}</b>
- <div class="points">${data[n]}</div>
- <div class="controls">
- <button class="minus" onclick="change('${n}',-1)">-</button>
- <button class="plus" onclick="change('${n}',1)">+</button>
- </div>
- </div>`;
- });
+  <div id="renameModal" class="modal">
+    <div class="modal-box">
+      <h2 class="modal-title">Rinomina atleta</h2>
+      <input id="renameInput" type="text" maxlength="24" />
+      <div class="modal-actions">
+        <button id="renameCancelBtn" class="btn-dark">Annulla</button>
+        <button id="renameConfirmBtn" class="btn-yellow">Salva</button>
+      </div>
+    </div>
+  </div>
 
- document.getElementById("list").innerHTML=html;
-}
+  <div id="deleteModal" class="modal">
+    <div class="modal-box">
+      <h2 class="modal-title">Elimina atleta</h2>
+      <p class="modal-text" id="deleteText">Confermi eliminazione?</p>
+      <div class="modal-actions">
+        <button id="deleteCancelBtn" class="btn-dark">Annulla</button>
+        <button id="deleteConfirmBtn" class="btn-red">Elimina</button>
+      </div>
+    </div>
+  </div>
 
-function add(){
- let n=document.getElementById("name").value;
- if(!n)return;
- data[n]=100;
- save();
- render();
-}
+  <div id="resetAllModal" class="modal">
+    <div class="modal-box">
+      <h2 class="modal-title">Reset totale</h2>
+      <p class="modal-text">Tutti i punteggi torneranno a 100.</p>
+      <div class="modal-actions">
+        <button id="resetAllCancelBtn" class="btn-dark">Annulla</button>
+        <button id="resetAllConfirmBtn" class="btn-red">Resetta tutti</button>
+      </div>
+    </div>
+  </div>
 
-function change(n,v){
- data[n]+=v;
- save();
- render();
-}
+  <div id="manualPointsModal" class="modal">
+    <div class="modal-box">
+      <h2 class="modal-title">Imposta punteggio manuale</h2>
+      <p class="modal-text" id="manualPointsText">Inserisci il nuovo punteggio.</p>
+      <input id="manualPointsInput" type="number" min="0" step="1" />
+      <div class="modal-actions">
+        <button id="manualPointsCancelBtn" class="btn-dark">Annulla</button>
+        <button id="manualPointsConfirmBtn" class="btn-yellow">Salva</button>
+      </div>
+    </div>
+  </div>
 
-render();
-</script>
+  <div id="rulesModal" class="modal">
+    <div class="modal-box">
+      <h2 class="modal-title">Premi e penalità</h2>
+      <p class="modal-text">Aggiungi nuove voci al menu rapido da usare per ogni atleta.</p>
 
+      <div class="rule-row">
+        <input id="ruleNameInput" type="text" placeholder="Nome premio / penalità" maxlength="60" />
+        <input id="rulePointsInput" type="number" placeholder="Punti" step="1" />
+      </div>
+
+      <div class="modal-actions">
+        <button id="addRuleBtn" class="btn-green">Aggiungi regola</button>
+        <button id="rulesCloseBtn" class="btn-dark">Chiudi</button>
+      </div>
+
+      <div class="mini">Usa punti negativi per penalità e positivi per premi. Esempio: -15 oppure +20.</div>
+
+      <div id="rulesList" class="rules-list"></div>
+    </div>
+  </div>
+
+  <script>
+    const PLAYERS_KEY = "aura_o3tt_players_v2";
+    const RULES_KEY = "aura_o3tt_rules_v1";
+
+    const defaultRules = [
+      { id: makeId(), name: "Abbigliamento tecnico dimenticato", points: -100 },
+      { id: makeId(), name: "Fare tardi a colazione", points: -50 },
+      { id: makeId(), name: "“Svenimenti” all’arrivo", points: -25 },
+      { id: makeId(), name: "Fare tardi agli allenamenti", points: -20 },
+      { id: makeId(), name: "Domande nel momento sbagliato", points: -15 },
+      { id: makeId(), name: "Interruzione durante la spiegazione", points: -15 },
+      { id: makeId(), name: "Distrarsi durante la spiegazione", points: -10 },
+      { id: makeId(), name: "Dire “non ce la faccio”", points: -5 },
+      { id: makeId(), name: "Zc perfetta incluso In & Out", points: 30 },
+      { id: makeId(), name: "Arrivo al traguardo da atleti", points: 20 },
+      { id: makeId(), name: "Montare / smontare bici da soli", points: 20 },
+      { id: makeId(), name: "In anticipo alla colazione od appuntamenti", points: 20 },
+      { id: makeId(), name: "Per ogni PB", points: 15 },
+      { id: makeId(), name: "In orario alla colazione od appuntamenti", points: 10 }
+    ];
+
+    let players = loadPlayers();
+    let rules = loadRules();
+
+    let renameTargetId = null;
+    let deleteTargetId = null;
+    let manualPointsTargetId = null;
+
+    const nameInput = document.getElementById("nameInput");
+    const addBtn = document.getElementById("addBtn");
+    const sortBtn = document.getElementById("sortBtn");
+    const resetAllBtn = document.getElementById("resetAllBtn");
+    const manageRulesBtn = document.getElementById("manageRulesBtn");
+    const playersList = document.getElementById("playersList");
+
+    const statPlayers = document.getElementById("statPlayers");
+    const statLeader = document.getElementById("statLeader");
+    const statTop = document.getElementById("statTop");
+
+    const renameModal = document.getElementById("renameModal");
+    const renameInput = document.getElementById("renameInput");
+    const renameCancelBtn = document.getElementById("renameCancelBtn");
+    const renameConfirmBtn = document.getElementById("renameConfirmBtn");
+
+    const deleteModal = document.getElementById("deleteModal");
+    const deleteText = document.getElementById("deleteText");
+    const deleteCancelBtn = document.getElementById("deleteCancelBtn");
+    const deleteConfirmBtn = document.getElementById("deleteConfirmBtn");
+
+    const resetAllModal = document.getElementById("resetAllModal");
+    const resetAllCancelBtn = document.getElementById("resetAllCancelBtn");
+    const resetAllConfirmBtn = document.getElementById("resetAllConfirmBtn");
+
+    const manualPointsModal = document.getElementById("manualPointsModal");
+    const manualPointsText = document.getElementById("manualPointsText");
+    const manualPointsInput = document.getElementById("manualPointsInput");
+    const manualPointsCancelBtn = document.getElementById("manualPointsCancelBtn");
+    const manualPointsConfirmBtn = document.getElementById("manualPointsConfirmBtn");
+
+    const rulesModal = document.getElementById("rulesModal");
+    const ruleNameInput = document.getElementById("ruleNameInput");
+    const rulePointsInput = document.getElementById("rulePointsInput");
+    const addRuleBtn = document.getElementById("addRuleBtn");
+    const rulesCloseBtn = document.getElementById("rulesCloseBtn");
+    const rulesList = document.getElementById("rulesList");
+
+    function vibrate(ms = 20) {
+      if (navigator.vibrate) navigator.vibrate(ms);
+    }
+
+    function makeId() {
+      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+      return String(Date.now() + Math.random());
+    }
+
+    function loadPlayers() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(PLAYERS_KEY));
+        return Array.isArray(saved) ? saved : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function savePlayers() {
+      localStorage.setItem(PLAYERS_KEY, JSON.stringify(players));
+    }
+
+    function loadRules() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(RULES_KEY));
+        return Array.isArray(saved) && saved.length ? saved : defaultRules;
+      } catch {
+        return defaultRules;
+      }
+    }
+
+    function saveRules() {
+      localStorage.setItem(RULES_KEY, JSON.stringify(rules));
+    }
+
+    function sortPlayers() {
+      players.sort((a, b) => b.points - a.points || a.name.localeCompare(b.name, "it"));
+    }
+
+    function sortRules() {
+      rules.sort((a, b) => b.points - a.points || a.name.localeCompare(b.name, "it"));
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function updateStats() {
+      statPlayers.textContent = players.length;
+
+      if (players.length === 0) {
+        statLeader.textContent = "—";
+        statTop.textContent = "—";
+        return;
+      }
+
+      sortPlayers();
+      statLeader.textContent = players[0].name;
+      statTop.textContent = players[0].points + " pt";
+    }
+
+    function renderRulesList() {
+      sortRules();
+
+      rulesList.innerHTML = rules.map(rule => `
+        <div class="rule-item">
+          <div>${escapeHtml(rule.name)}</div>
+          <div class="rule-badge ${rule.points >= 0 ? "positive" : "negative"}">
+            ${rule.points >= 0 ? "+" : ""}${rule.points}
+          </div>
+          <button class="btn-red" data-rule-delete="${rule.id}">Elimina</button>
+        </div>
+      `).join("");
+    }
+
+    function getRulesOptionsHtml() {
+      sortRules();
+      return rules.map(rule => `
+        <option value="${rule.id}">
+          ${rule.points >= 0 ? "+" : ""}${rule.points} · ${escapeHtml(rule.name)}
+        </option>
+      `).join("");
+    }
+
+    function renderPlayers() {
+      sortPlayers();
+      updateStats();
+
+      if (players.length === 0) {
+        playersList.innerHTML = `<div class="empty">Nessun atleta inserito. Aggiungi il primo nome per iniziare.</div>`;
+        return;
+      }
+
+      const rulesOptions = getRulesOptionsHtml();
+
+      playersList.innerHTML = players.map((player, index) => `
+        <article class="player-card ${index === 0 ? "leader" : ""}">
+          <div class="player-top">
+            <div>
+              <h3 class="player-name">${escapeHtml(player.name)}</h3>
+              <div class="player-sub">Posizione #${index + 1}</div>
+            </div>
+
+            <div class="points-box">
+              <div class="points">${player.points}</div>
+              <div class="points-label">pt aura</div>
+            </div>
+          </div>
+
+          <div class="score-actions">
+            <button class="score-btn minus" data-action="minus" data-id="${player.id}">-1</button>
+            <button class="score-btn plus" data-action="plus" data-id="${player.id}">+1</button>
+            <button class="score-btn manual" data-action="manual" data-id="${player.id}">Punteggio manuale</button>
+          </div>
+
+          <div class="apply-row">
+            <select data-rule-select="${player.id}">
+              <option value="">Seleziona premio / penalità</option>
+              ${rulesOptions}
+            </select>
+            <button class="btn-yellow" data-action="applyRule" data-id="${player.id}">Applica</button>
+          </div>
+
+          <div class="meta-actions">
+            <button class="meta-btn" data-action="rename" data-id="${player.id}">Rinomina</button>
+            <button class="meta-btn" data-action="reset" data-id="${player.id}">Reset 100</button>
+            <button class="meta-btn" data-action="delete" data-id="${player.id}">Elimina</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function render() {
+      renderPlayers();
+      renderRulesList();
+    }
+
+    function addPlayer() {
+      const name = nameInput.value.trim();
+      if (!name) return;
+
+      const existing = players.find(p => p.name.toLowerCase() === name.toLowerCase());
+      if (existing) return;
+
+      players.push({
+        id: makeId(),
+        name,
+        points: 100
+      });
+
+      nameInput.value = "";
+      savePlayers();
+      render();
+      vibrate(30);
+    }
+
+    function changePoints(id, delta) {
+      const player = players.find(p => p.id === id);
+      if (!player) return;
+
+      const next = player.points + delta;
+      player.points = Math.max(0, next);
+
+      savePlayers();
+      render();
+      vibrate(18);
+    }
+
+    function setManualPoints(id, value) {
+      const player = players.find(p => p.id === id);
+      if (!player) return;
+
+      const cleanValue = Number(value);
+      if (!Number.isFinite(cleanValue)) return;
+
+      player.points = Math.max(0, Math.round(cleanValue));
+      savePlayers();
+      render();
+      vibrate(24);
+    }
+
+    function applyRuleToPlayer(playerId) {
+      const select = document.querySelector(`[data-rule-select="${playerId}"]`);
+      if (!select || !select.value) return;
+
+      const player = players.find(p => p.id === playerId);
+      const rule = rules.find(r => r.id === select.value);
+      if (!player || !rule) return;
+
+      player.points = Math.max(0, player.points + rule.points);
+
+      savePlayers();
+      render();
+      vibrate(26);
+    }
+
+    function resetPlayer(id) {
+      const player = players.find(p => p.id === id);
+      if (!player) return;
+
+      player.points = 100;
+      savePlayers();
+      render();
+      vibrate(24);
+    }
+
+    function addRule() {
+      const name = ruleNameInput.value.trim();
+      const points = Number(rulePointsInput.value);
+
+      if (!name) return;
+      if (!Number.isFinite(points) || points === 0) return;
+
+      rules.push({
+        id: makeId(),
+        name,
+        points: Math.round(points)
+      });
+
+      ruleNameInput.value = "";
+      rulePointsInput.value = "";
+      saveRules();
+      render();
+      vibrate(30);
+    }
+
+    function deleteRule(ruleId) {
+      rules = rules.filter(r => r.id !== ruleId);
+      saveRules();
+      render();
+      vibrate(22);
+    }
+
+    function openRenameModal(id, currentName) {
+      renameTargetId = id;
+      renameInput.value = currentName || "";
+      renameModal.classList.add("open");
+      renameInput.focus();
+      renameInput.select();
+    }
+
+    function closeRenameModal() {
+      renameModal.classList.remove("open");
+      renameTargetId = null;
+    }
+
+    function confirmRename() {
+      const player = players.find(p => p.id === renameTargetId);
+      if (!player) return closeRenameModal();
+
+      const newName = renameInput.value.trim();
+      if (!newName) return;
+
+      player.name = newName;
+      savePlayers();
+      render();
+      closeRenameModal();
+      vibrate(28);
+    }
+
+    function openDeleteModal(id) {
+      const player = players.find(p => p.id === id);
+      if (!player) return;
+
+      deleteTargetId = id;
+      deleteText.textContent = `Confermi eliminazione di ${player.name}?`;
+      deleteModal.classList.add("open");
+    }
+
+    function closeDeleteModal() {
+      deleteModal.classList.remove("open");
+      deleteTargetId = null;
+    }
+
+    function confirmDelete() {
+      if (!deleteTargetId) return closeDeleteModal();
+
+      players = players.filter(p => p.id !== deleteTargetId);
+      savePlayers();
+      render();
+      closeDeleteModal();
+      vibrate(34);
+    }
+
+    function openResetAllModal() {
+      resetAllModal.classList.add("open");
+    }
+
+    function closeResetAllModal() {
+      resetAllModal.classList.remove("open");
+    }
+
+    function confirmResetAll() {
+      players = players.map(p => ({ ...p, points: 100 }));
+      savePlayers();
+      render();
+      closeResetAllModal();
+      vibrate(40);
+    }
+
+    function openManualPointsModal(id) {
+      const player = players.find(p => p.id === id);
+      if (!player) return;
+
+      manualPointsTargetId = id;
+      manualPointsText.textContent = `Inserisci il nuovo punteggio per ${player.name}.`;
+      manualPointsInput.value = player.points;
+      manualPointsModal.classList.add("open");
+      manualPointsInput.focus();
+      manualPointsInput.select();
+    }
+
+    function closeManualPointsModal() {
+      manualPointsModal.classList.remove("open");
+      manualPointsTargetId = null;
+    }
+
+    function confirmManualPoints() {
+      if (!manualPointsTargetId) return closeManualPointsModal();
+      setManualPoints(manualPointsTargetId, manualPointsInput.value);
+      closeManualPointsModal();
+    }
+
+    function openRulesModal() {
+      renderRulesList();
+      rulesModal.classList.add("open");
+    }
+
+    function closeRulesModal() {
+      rulesModal.classList.remove("open");
+    }
+
+    addBtn.addEventListener("click", addPlayer);
+
+    nameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") addPlayer();
+    });
+
+    sortBtn.addEventListener("click", () => {
+      sortPlayers();
+      savePlayers();
+      render();
+      vibrate(18);
+    });
+
+    resetAllBtn.addEventListener("click", openResetAllModal);
+    manageRulesBtn.addEventListener("click", openRulesModal);
+
+    playersList.addEventListener("click", (e) => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+
+      const id = btn.dataset.id;
+      const action = btn.dataset.action;
+
+      if (action === "plus") changePoints(id, 1);
+      if (action === "minus") changePoints(id, -1);
+      if (action === "reset") resetPlayer(id);
+      if (action === "manual") openManualPointsModal(id);
+      if (action === "applyRule") applyRuleToPlayer(id);
+
+      if (action === "rename") {
+        const player = players.find(p => p.id === id);
+        if (player) openRenameModal(id, player.name);
+      }
+
+      if (action === "delete") openDeleteModal(id);
+    });
+
+    renameCancelBtn.addEventListener("click", closeRenameModal);
+    renameConfirmBtn.addEventListener("click", confirmRename);
+
+    deleteCancelBtn.addEventListener("click", closeDeleteModal);
+    deleteConfirmBtn.addEventListener("click", confirmDelete);
+
+    resetAllCancelBtn.addEventListener("click", closeResetAllModal);
+    resetAllConfirmBtn.addEventListener("click", confirmResetAll);
+
+    manualPointsCancelBtn.addEventListener("click", closeManualPointsModal);
+    manualPointsConfirmBtn.addEventListener("click", confirmManualPoints);
+
+    rulesCloseBtn.addEventListener("click", closeRulesModal);
+    addRuleBtn.addEventListener("click", addRule);
+
+    rulesList.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-rule-delete]");
+      if (!btn) return;
+      deleteRule(btn.dataset.ruleDelete);
+    });
+
+    renameModal.addEventListener("click", (e) => {
+      if (e.target === renameModal) closeRenameModal();
+    });
+
+    deleteModal.addEventListener("click", (e) => {
+      if (e.target === deleteModal) closeDeleteModal();
+    });
+
+    resetAllModal.addEventListener("click", (e) => {
+      if (e.target === resetAllModal) closeResetAllModal();
+    });
+
+    manualPointsModal.addEventListener("click", (e) => {
+      if (e.target === manualPointsModal) closeManualPointsModal();
+    });
+
+    rulesModal.addEventListener("click", (e) => {
+      if (e.target === rulesModal) closeRulesModal();
+    });
+
+    renameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") confirmRename();
+    });
+
+    manualPointsInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") confirmManualPoints();
+    });
+
+    rulePointsInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") addRule();
+    });
+
+    render();
+  </script>
 </body>
 </html>
