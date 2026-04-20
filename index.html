@@ -251,19 +251,6 @@
       box-shadow:0 0 0 1px rgba(255,212,0,.08), var(--shadow);
     }
 
-    .ranking-card.leader::before{
-      content:"LEADER";
-      position:absolute;
-      top:10px;
-      right:10px;
-      background:var(--yellow);
-      color:#000;
-      font-size:9px;
-      font-weight:900;
-      padding:5px 8px;
-      border-radius:999px;
-    }
-
     .ranking-top{
       display:grid;
       grid-template-columns: auto minmax(0,1fr) auto auto;
@@ -286,6 +273,10 @@
       flex-shrink:0;
     }
 
+    .athlete-info{
+      min-width:0;
+    }
+
     .athlete-name{
       font-size:17px;
       font-weight:900;
@@ -293,6 +284,18 @@
       line-height:1.15;
       overflow-wrap:anywhere;
       word-break:break-word;
+    }
+
+    .leader-badge-inline{
+      display:inline-block;
+      margin-top:6px;
+      background:var(--yellow);
+      color:#000;
+      font-size:9px;
+      font-weight:900;
+      padding:4px 8px;
+      border-radius:999px;
+      letter-spacing:.4px;
     }
 
     .score-box,
@@ -502,6 +505,12 @@
 
       .athlete-name{
         font-size:15px;
+      }
+
+      .leader-badge-inline{
+        margin-top:5px;
+        font-size:8px;
+        padding:4px 7px;
       }
 
       .score-box,
@@ -860,8 +869,9 @@
             <div class="ranking-top">
               <div class="rank-number">#${index + 1}</div>
 
-              <div>
+              <div class="athlete-info">
                 <h3 class="athlete-name">${escapeHtml(player.name)}</h3>
+                ${index === 0 ? `<div class="leader-badge-inline">LEADER</div>` : ``}
               </div>
 
               <div class="score-box">
